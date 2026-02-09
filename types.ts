@@ -1,4 +1,4 @@
-export type PageState = 'landing' | 'sudoku' | 'next_chapter';
+export type PageState = 'landing' | 'sudoku' | 'loading' | 'next_chapter';
 
 export interface SudokuCell {
   value: number;

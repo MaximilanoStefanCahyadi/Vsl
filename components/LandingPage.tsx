@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Monitor, ArrowRight } from 'lucide-react';
+import { Sparkles, Monitor, Mic, Plus, Send } from 'lucide-react';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -17,65 +17,88 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-pink-50 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col bg-gradient-to-b from-white via-yellow-50/30 to-pink-50/20 font-sans text-gray-800 relative overflow-hidden">
       
-      {/* Background Decorative Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-fred-yellow opacity-20 blur-[100px] rounded-full mix-blend-multiply" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-fred-pink opacity-20 blur-[100px] rounded-full mix-blend-multiply" />
+      {/* Decorative blurred blobs to maintain yellow/pink theme subtly */}
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-fred-yellow/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-fred-pink/10 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Mobile Warning Banner */}
+      {/* Navbar */}
+      <div className="w-full p-6 flex justify-between items-center z-20">
+        <div className="flex items-center gap-2 text-gray-700">
+            <Sparkles className="w-5 h-5 text-fred-pink" />
+            <span className="font-medium text-lg tracking-tight">FredAI</span>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-fred-yellow to-fred-pink flex items-center justify-center text-white font-bold text-sm shadow-sm">
+            F
+        </div>
+      </div>
+
+      {/* Mobile Warning */}
       {isMobile && (
-        <motion.div 
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="absolute top-0 left-0 w-full bg-fred-red text-white p-3 flex items-center justify-center gap-2 text-sm font-medium z-50 shadow-md"
-        >
-          <Monitor size={16} />
-          <span>For the best experience, please switch to desktop!</span>
-        </motion.div>
+         <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-fred-red/90 backdrop-blur text-white px-4 py-3 text-center text-sm font-medium z-50 flex items-center justify-center gap-2 absolute top-16 w-full left-0"
+         >
+            <Monitor size={16} />
+            For the best experience, please use a desktop!
+         </motion.div>
       )}
 
       {/* Main Content */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-center z-10 px-6 max-w-2xl"
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="mb-6 inline-block"
+      <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full px-6 md:px-12 pb-20">
+        
+        {/* Greeting Section */}
+        <div className="mb-12">
+            <motion.h1 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-6xl md:text-7xl font-medium tracking-tight mb-4"
+            >
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-fred-pink via-orange-400 to-fred-yellow drop-shadow-sm">Hi, Fred!</span>
+            </motion.h1>
+            <motion.h2 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-4xl md:text-5xl font-medium text-gray-300 tracking-tight"
+            >
+                Ready for your surprise?
+            </motion.h2>
+        </div>
+
+        {/* Input Bar Simulation Button */}
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            onClick={onStart}
+            className="w-full"
         >
-           <Sparkles className="w-12 h-12 text-fred-yellow mx-auto mb-4" />
+             <div className="w-full bg-[#f0f4f9] hover:bg-[#e9eef6] transition-colors duration-200 rounded-[2rem] h-16 md:h-[4.5rem] flex items-center px-6 cursor-pointer relative group">
+                
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200/50 transition-colors mr-2">
+                     <Plus className="text-gray-500 w-5 h-5" />
+                </div>
+                
+                <div className="flex-1 text-gray-500 text-lg font-normal truncate">
+                    Tap to start the Valentine's game...
+                </div>
+                
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200/50 transition-colors">
+                        <Mic className="text-gray-500 w-5 h-5" />
+                    </div>
+                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200/50 transition-colors group-hover:text-fred-pink">
+                        <Send className="text-gray-500 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                </div>
+             </div>
         </motion.div>
 
-        <h1 className="text-6xl md:text-7xl font-serif font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-fred-yellow via-orange-400 to-fred-pink pb-2">
-          Hi, Fred!
-        </h1>
-
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 1 }}
-          className="text-gray-600 text-lg md:text-xl font-light mb-12 leading-relaxed"
-        >
-          I've made something special for you this Valentine's Day.<br/>
-          Are you ready to begin?
-        </motion.p>
-
-        <motion.button
-          onClick={onStart}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="group relative px-8 py-4 bg-white border-2 border-fred-yellow text-gray-800 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hover:border-fred-pink transition-all duration-300 flex items-center gap-3 mx-auto overflow-hidden"
-        >
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-fred-yellow to-fred-pink opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
-          <span>Let's Go</span>
-          <ArrowRight className="w-5 h-5 text-fred-pink group-hover:translate-x-1 transition-transform" />
-        </motion.button>
-      </motion.div>
+      </div>
     </div>
   );
 };
