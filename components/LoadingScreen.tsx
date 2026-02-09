@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { PawPrint } from 'lucide-react';
 import { ASSETS } from '../assets/images';
 
@@ -40,97 +39,62 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
   const { src: currentImage, text: currentText } = getCurrentState();
 
-  // Animation variants for the image swap
-  const imageVariants = {
-    initial: { opacity: 0, scale: 0.9 },
-    animate: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 1.1 }
-  };
-
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-fred-pink text-white p-8 overflow-hidden relative">
       
-      {/* Background patterns */}
+      {/* Static Background patterns (No animation) */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-fred-yellow rounded-full blur-3xl" />
-          {/* Animated clouds for flying effect */}
-          <motion.div 
-            className="absolute top-1/4 left-[-10%] w-20 h-10 bg-white rounded-full blur-xl"
-            animate={{ x: ['120vw'] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.div 
-            className="absolute top-2/3 left-[-10%] w-32 h-16 bg-white rounded-full blur-xl"
-            animate={{ x: ['120vw'] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "linear", delay: 2 }}
-          />
       </div>
 
       <div className="z-10 flex flex-col items-center w-full max-w-lg">
         
-        {/* Snoopy Display */}
-        <div className="mb-12 h-64 w-full relative flex items-center justify-center">
-            {/* White circle background behind snoopy */}
-            <motion.div 
-                className="absolute inset-0 bg-white/20 rounded-full blur-md w-64 h-64 mx-auto"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-            />
+        {/* Snoopy Display (Static Step-by-Step Image) */}
+        <div className="mb-8 h-64 w-full relative flex items-center justify-center">
+            {/* White circle background */}
+            <div className="absolute inset-0 bg-white/20 rounded-full blur-md w-64 h-64 mx-auto" />
             
-            <motion.img
-                key={currentImage} // Key change triggers animation
+            <img
+                key={currentImage} // Forces instant switch without React reconciling attributes
                 src={currentImage}
-                alt="Snoopy Animation"
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={imageVariants}
-                transition={{ duration: 0.4 }}
+                alt="Snoopy Step"
                 className="relative z-10 h-full object-contain drop-shadow-xl"
             />
         </div>
 
         {/* Loading Text */}
-        <motion.h2 
-            key={currentText}
-            className="text-3xl font-serif font-bold mb-8 text-white drop-shadow-md text-center h-10"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-        >
+        <h2 className="text-3xl font-serif font-bold mb-6 text-white drop-shadow-md text-center h-10">
             {currentText}
-        </motion.h2>
+        </h2>
 
-        {/* Paw Print Progress Bar */}
-        <div className="w-full flex justify-between items-center px-4 md:px-10">
-            {[...Array(10)].map((_, i) => {
-                const stepThreshold = (i + 1) * 10;
-                const isFilled = progress >= stepThreshold;
+        {/* Progress Bar */}
+        <div className="w-full px-8 mt-4">
+            <div className="relative h-4 w-full">
+                {/* Track Background */}
+                <div className="absolute inset-0 bg-white/20 rounded-full backdrop-blur-sm" />
                 
-                return (
-                    <motion.div
-                        key={i}
-                        initial={{ scale: 0.8, opacity: 0.5 }}
-                        animate={{ 
-                            scale: isFilled ? 1.2 : 1, 
-                            opacity: isFilled ? 1 : 0.3,
-                            color: isFilled ? '#FDE047' : '#FFFFFF' // Yellow when filled, White when empty
-                        }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                    >
-                        <PawPrint 
-                            className="w-6 h-6 md:w-8 md:h-8" 
-                            fill={isFilled ? "currentColor" : "none"} 
-                        />
-                    </motion.div>
-                );
-            })}
-        </div>
-        
-        {/* Percentage */}
-        <div className="mt-4 font-mono font-bold text-xl text-fred-yellow">
-            {Math.round(progress)}%
+                {/* Fill Bar */}
+                <div 
+                    className="absolute top-0 left-0 bottom-0 bg-fred-yellow rounded-full shadow-[0_0_15px_rgba(253,224,71,0.5)] transition-all duration-100 ease-linear"
+                    style={{ width: `${progress}%` }}
+                />
+
+                {/* Moving Thumb Indicator */}
+                <div 
+                    className="absolute top-1/2 -translate-y-1/2 z-10 transition-all duration-100 ease-linear"
+                    style={{ left: `${progress}%` }}
+                >
+                    <div className="bg-white p-2 rounded-full shadow-lg -translate-x-1/2 flex items-center justify-center">
+                        <PawPrint className="w-5 h-5 text-fred-pink" fill="currentColor" />
+                    </div>
+                </div>
+            </div>
+            
+            {/* Percentage Text */}
+            <div className="mt-8 text-center font-mono font-bold text-xl text-fred-yellow drop-shadow-sm">
+                {Math.round(progress)}%
+            </div>
         </div>
 
       </div>
