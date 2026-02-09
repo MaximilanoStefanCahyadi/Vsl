@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PawPrint } from 'lucide-react';
+import { ASSETS } from '../assets/images';
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -8,12 +9,6 @@ interface LoadingScreenProps {
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
-
-  // Snoopy Flying Ace Sequence
-  // These URLs match the progression: Walking with gear -> Red Motorcycle -> Flying
-  const SNOOPY_WALKING = "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHM5eG1vY3lmaHM5eG1vY3lmaHM5eG1vY3lmaHM5eG1vY3lmaHM5eG1vY3lmaHM5eG1vY3lmaHM5eG1vY3kv3o6vXVzKWtk4jB9bKf/giphy.gif"; // Walking with scarf/goggles
-  const SNOOPY_BIKING = "https://i.pinimg.com/originals/52/69/3a/52693a027b40974e64b854e488950348.gif"; // Red Motorcycle
-  const SNOOPY_FLYING = "https://i.pinimg.com/originals/8a/75/b2/8a75b252062363198889955376548777.gif"; // Flying (Doghouse/Plane)
 
   useEffect(() => {
     const duration = 6000; // 6 seconds total loading time
@@ -38,9 +33,9 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
   // Determine which Snoopy to show based on progress
   const getCurrentState = () => {
-    if (progress < 30) return { src: SNOOPY_WALKING, text: "Suiting up..." };
-    if (progress < 70) return { src: SNOOPY_BIKING, text: "Speeding to you..." };
-    return { src: SNOOPY_FLYING, text: "Love is in the air!" };
+    if (progress < 30) return { src: ASSETS.SNOOPY.WALKING, text: "Suiting up..." };
+    if (progress < 70) return { src: ASSETS.SNOOPY.BIKING, text: "Speeding to you..." };
+    return { src: ASSETS.SNOOPY.FLYING, text: "Love is in the air!" };
   };
 
   const { src: currentImage, text: currentText } = getCurrentState();
