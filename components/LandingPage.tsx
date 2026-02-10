@@ -17,10 +17,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-b from-white via-yellow-50/30 to-pink-50/20 font-sans text-gray-800 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col bg-gradient-to-b from-yellow-50 via-fred-yellow-light/50 to-white font-sans text-gray-800 relative overflow-hidden">
       
       {/* Decorative blurred blobs to maintain yellow/pink theme subtly */}
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-fred-yellow/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-fred-yellow/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-fred-pink/10 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Navbar */}
@@ -63,7 +63,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-4xl md:text-5xl font-medium text-gray-300 tracking-tight"
+                className="text-4xl md:text-5xl font-medium text-gray-400 tracking-tight"
             >
                 Ready for your surprise?
             </motion.h2>
@@ -77,9 +77,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             onClick={onStart}
             className="w-full"
         >
-             <div className="w-full bg-[#f0f4f9] hover:bg-[#e9eef6] transition-colors duration-200 rounded-[2rem] h-16 md:h-[4.5rem] flex items-center px-6 cursor-pointer relative group">
+             <div className="w-full bg-white/80 hover:bg-white transition-colors duration-200 rounded-[2rem] h-16 md:h-[4.5rem] flex items-center px-6 cursor-pointer relative group border border-white/50 shadow-sm">
                 
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200/50 transition-colors mr-2">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-yellow-100 transition-colors mr-2">
                      <Plus className="text-gray-500 w-5 h-5" />
                 </div>
                 
@@ -88,10 +88,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200/50 transition-colors">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-yellow-100 transition-colors">
                         <Mic className="text-gray-500 w-5 h-5" />
                     </div>
-                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200/50 transition-colors group-hover:text-fred-pink">
+                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-yellow-100 transition-colors group-hover:text-fred-pink">
                         <Send className="text-gray-500 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                 </div>
