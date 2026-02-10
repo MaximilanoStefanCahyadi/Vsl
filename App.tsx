@@ -1,18 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import SudokuGame from './components/SudokuGame';
 import FlowerTransition from './components/FlowerTransition';
 import LoadingScreen from './components/LoadingScreen';
 import ChatPage from './components/ChatPage';
+import FinalPage from './components/FinalPage'; // Imported new component
 import { PageState } from './types';
+import { ASSETS } from './assets/images';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageState>('landing');
   const [showTransition, setShowTransition] = useState(false);
+  
+  // Reference to hold audio instance so it persists across renders
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const startBackgroundMusic = () => {
+    if (audioRef.current) return; // Already playing
+
+    const audio = new Audio(ASSETS.MUSIC.THEME);
+    audio.loop = true;
+    audio.volume = 0; // Start at 0 for fade in
+    
+    const playPromise = audio.play();
+    
+    if (playPromise !== undefined) {
+        playPromise.then(_ => {
+            // Fade in logic
+            let vol = 0;
+            const targetVol = 0.6; // Max volume
+            const fadeInterval = setInterval(() => {
+                if (vol < targetVol) {
+                    vol += 0.05;
+                    // Ensure we don't exceed 1 or target
+                    audio.volume = Math.min(vol, targetVol);
+                } else {
+                    clearInterval(fadeInterval);
+                }
+            }, 500); // Step every 500ms
+        }).catch(error => {
+            console.warn("Autoplay prevented:", error);
+        });
+    }
+    
+    audioRef.current = audio;
+  };
 
   const handleSudokuComplete = () => {
-    // Start the transition
+    // Start the visual transition
     setShowTransition(true);
   };
 
@@ -20,6 +56,9 @@ const App: React.FC = () => {
     // Once flower covers screen, switch to loading
     setCurrentPage('loading');
     setShowTransition(false);
+    
+    // Start the music fade-in here
+    startBackgroundMusic();
   };
 
   const renderPage = () => {
@@ -33,14 +72,7 @@ const App: React.FC = () => {
       case 'chat':
         return <ChatPage key="chat" onComplete={() => setCurrentPage('next_chapter')} />;
       case 'next_chapter':
-        return (
-            <div className="flex items-center justify-center h-screen bg-fred-yellow text-center p-8 text-gray-800">
-                <div>
-                    <h1 className="text-4xl font-serif font-bold mb-4 text-fred-pink">To Be Continued...</h1>
-                    <p className="opacity-90 font-medium">Happy Valentine's Day, Fred!</p>
-                </div>
-            </div>
-        );
+        return <FinalPage key="final" />;
       default:
         return null;
     }

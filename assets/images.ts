@@ -10,5 +10,9 @@ export const ASSETS = {
     SAD: "public/Sad.png", // Crying/Sad
     CONFIRMATION: "public/Confirmation.png", // Questioning/Looking
     OOPS: "public/Oops.png" // Funny/Oops
+  },
+  MUSIC: {
+    // Please place the song "I Thought I Saw Your Face Today" here as 'song.mp3'
+    THEME: "public/song.mp3" 
   }
 };

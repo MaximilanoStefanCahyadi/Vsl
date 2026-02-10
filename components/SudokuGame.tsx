@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, CheckCircle, Trophy, Timer, Pause, Play, AlertCircle, Heart } from 'lucide-react';
+import { RefreshCw, CheckCircle, Trophy, Timer, Pause, Play, AlertCircle, Heart, Volume2, VolumeX } from 'lucide-react';
 import { GridType } from '../types';
 import { getInitialGrid, SOLVED_GRID } from '../constants';
 import confetti from 'canvas-confetti';
@@ -9,16 +9,71 @@ interface SudokuGameProps {
   onComplete: () => void;
 }
 
+// Simple synthesizer for sound effects
+const playSound = (type: 'correct' | 'error' | 'win' | 'click' | 'select') => {
+  try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+
+      const ctx = new AudioContext();
+      
+      const createOscillator = (freq: number, type: OscillatorType, startTime: number, duration: number, vol: number = 0.1) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, startTime);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        gain.gain.setValueAtTime(vol, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      const now = ctx.currentTime;
+
+      if (type === 'correct') {
+        // Happy major third chime
+        createOscillator(523.25, 'sine', now, 0.2); // C5
+        createOscillator(659.25, 'sine', now + 0.1, 0.3); // E5
+      } else if (type === 'error') {
+        // Dissonant low buzz
+        createOscillator(150, 'sawtooth', now, 0.3, 0.15);
+        createOscillator(140, 'sawtooth', now + 0.05, 0.3, 0.15);
+      } else if (type === 'select') {
+        // Soft bubble pop
+        createOscillator(600, 'sine', now, 0.05, 0.05);
+      } else if (type === 'click') {
+        // Typewriter click
+        createOscillator(800, 'triangle', now, 0.03, 0.05);
+      } else if (type === 'win') {
+         // Fanfare Arpeggio
+         const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98]; // C Major Arp
+         notes.forEach((freq, i) => {
+            createOscillator(freq, 'triangle', now + (i * 0.1), 0.5, 0.1);
+         });
+      }
+  } catch (e) {
+      console.error("Audio playback failed", e);
+  }
+};
+
 const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
   const [grid, setGrid] = useState<GridType>(getInitialGrid());
   const [selectedCell, setSelectedCell] = useState<{ r: number; c: number } | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   
   // New Game Stats State
-  const [score, setScore] = useState(999995);
+  // Initial score set to animate towards 160805
+  const [score, setScore] = useState(158000); 
   const [mistakes, setMistakes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Timer Logic
   useEffect(() => {
@@ -49,18 +104,27 @@ const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
 
       if (isCorrect && !isComplete) {
         setIsComplete(true);
-        // Animate score up
-        const targetScore = score + 500;
-        const step = 20;
+        if (soundEnabled) playSound('win');
+        
+        // Animate score up to exactly 160805
+        const targetScore = 160805;
+        const currentScore = score;
+        const diff = targetScore - currentScore;
+        const duration = 2000; // ms
+        const steps = 50;
+        const increment = diff / steps;
+        
+        let stepCount = 0;
         const interval = setInterval(() => {
+            stepCount++;
             setScore(prev => {
-                if (prev >= targetScore) {
+                if (stepCount >= steps) {
                     clearInterval(interval);
                     return targetScore;
                 }
-                return prev + step;
+                return Math.floor(prev + increment);
             });
-        }, 50);
+        }, duration / steps);
 
         confetti({
           particleCount: 150,
@@ -78,6 +142,7 @@ const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
 
   const handleCellClick = (r: number, c: number) => {
     if (isComplete || isPaused) return;
+    if (soundEnabled) playSound('select');
     setSelectedCell({ r, c });
   };
 
@@ -90,6 +155,13 @@ const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
     // Logic for mistakes and immediate validation visual
     const correctValue = SOLVED_GRID[r][c];
     const isMistake = num !== 0 && num !== correctValue;
+    const isCorrect = num === correctValue;
+
+    if (soundEnabled) {
+        if (isMistake) playSound('error');
+        else if (isCorrect) playSound('correct');
+        else playSound('click'); // Clearing a cell
+    }
 
     if (isMistake) {
         setMistakes(prev => prev + 1);
@@ -118,7 +190,7 @@ const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedCell, isComplete, grid, isPaused]);
+  }, [selectedCell, isComplete, grid, isPaused, soundEnabled]);
 
   const formatTime = (totalSeconds: number) => {
     const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -155,7 +227,7 @@ const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
                  </div>
             </div>
 
-            {/* Timer Section */}
+            {/* Timer & Controls Section */}
             <div className="flex items-center gap-4">
                 <div className="flex flex-col items-end">
                     <div className="flex items-center gap-1 mb-0.5">
@@ -171,6 +243,15 @@ const SudokuGame: React.FC<SudokuGameProps> = ({ onComplete }) => {
                         {formatTime(seconds)}
                     </div>
                 </div>
+                
+                {/* Sound Toggle */}
+                <button 
+                    onClick={() => setSoundEnabled(!soundEnabled)}
+                    className="w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors text-gray-400 hover:text-gray-600"
+                >
+                    {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                </button>
+
                 <button 
                     onClick={() => setIsPaused(!isPaused)}
                     className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-600"
